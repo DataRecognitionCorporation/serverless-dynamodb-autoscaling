@@ -2,6 +2,7 @@ declare interface Capacity {
   table: string | string[]
   index: string | string[]
   indexOnly?: boolean
+  roleArn?: string
   write?: CapacityConfiguration
   read?: CapacityConfiguration
 }
@@ -10,6 +11,9 @@ declare interface CapacityConfiguration {
   maximum: number
   minimum: number
   usage: number
+  cooldownScaleOut?: number
+  cooldownScaleIn?: number
+  disableScaleIn?: boolean
 }
 
 declare interface Options {
@@ -18,6 +22,7 @@ declare interface Options {
   service: string
   stage: string
   table: string
+  roleArn?: string
 }
 
 /**

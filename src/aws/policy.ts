@@ -8,7 +8,8 @@ export default class Policy extends Resource {
     private read: boolean,
     private value: number,
     private scaleIn: number,
-    private scaleOut: number
+    private scaleOut: number,
+    private disableScaleIn: boolean
   ) { super(options) }
 
   public toJSON(): any {
@@ -31,6 +32,7 @@ export default class Policy extends Resource {
             },
             ScaleInCooldown: this.scaleIn,
             ScaleOutCooldown: this.scaleOut,
+            DisableScaleIn: this.disableScaleIn,
             TargetValue: this.value
           }
         },

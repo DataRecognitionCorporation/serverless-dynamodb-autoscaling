@@ -76,12 +76,19 @@ class AWSDBAutoScaling {
       read: {
         maximum: config.read && config.read.maximum ? config.read.maximum : 200,
         minimum: config.read && config.read.minimum ? config.read.minimum : 5,
-        usage: config.read && config.read.usage ? config.read.usage : 0.75
+        usage: config.read && config.read.usage ? config.read.usage : 0.75,
+        cooldownScaleOut: config.read && config.read.cooldownScaleOut ? config.read.cooldownScaleOut : 0,
+        cooldownScaleIn: config.read && config.read.cooldownScaleIn ? config.read.cooldownScaleIn : 0,
+        disableScaleIn: config.read && config.read.disableScaleIn ? config.read.disableScaleIn : false
+
       },
       write: {
         maximum: config.write && config.write.maximum ? config.write.maximum : 200,
         minimum: config.write && config.write.minimum ? config.write.minimum : 5,
-        usage: config.write && config.write.usage ? config.write.usage : 0.75
+        usage: config.write && config.write.usage ? config.write.usage : 0.75,
+        cooldownScaleOut: config.read && config.read.cooldownScaleOut ? config.read.cooldownScaleOut : 0,
+        cooldownScaleIn: config.read && config.read.cooldownScaleIn ? config.read.cooldownScaleIn : 0,
+        disableScaleIn: config.read && config.read.disableScaleIn ? config.read.disableScaleIn : false
       }
     }
   }
@@ -106,9 +113,13 @@ class AWSDBAutoScaling {
     )
 
     // Add role to manage Auto Scaling policies
-    const resources: any[] = [
-      new Role(options)
-    ]
+    const resources: any[] = []
+
+    if (!config.roleArn) {
+      resources.push(new Role(options))
+    } else {
+      options.roleArn = config.roleArn
+    }
 
     // Only add Auto Scaling for read capacity if configuration set is available
     if (!!config.read) {
@@ -128,7 +139,7 @@ class AWSDBAutoScaling {
    */
   private getPolicyAndTarget(options: Options, data: CapacityConfiguration, read: boolean): any[] {
     return [
-      new Policy(options, read, data.usage * 100, 60, 60),
+      new Policy(options, read, data.usage * 100, data.cooldownScaleIn || 60, data.cooldownScaleOut || 60, data.disableScaleIn || false),
       new Target(options, read, data.minimum, data.maximum)
     ]
   }
