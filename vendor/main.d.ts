@@ -11,6 +11,9 @@ declare interface CapacityConfiguration {
   maximum: number
   minimum: number
   usage: number
+  cooldownScaleOut?: number
+  cooldownScaleIn?: number
+  disableScaleIn?: boolean
 }
 
 declare interface Options {
